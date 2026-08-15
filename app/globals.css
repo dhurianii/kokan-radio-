@@ -1,0 +1,144 @@
+@import "tailwindcss";
+
+/* Tailwind v4 doesn't have a `content` config — point it at the source files
+   from inside the stylesheet so the generated CSS picks up every utility. */
+@source "../**/*.{ts,tsx}";
+
+/* -------------------------------------------------------------------------- */
+/* Design tokens                                                              */
+/* -------------------------------------------------------------------------- */
+@theme {
+  --color-accent: #f07a2b;          /* sunset orange pulled from the artwork */
+  --color-accent-soft: #ffb17a;
+  --color-glass-stroke: rgba(255, 255, 255, 0.10);
+
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+  --font-display: "Tiro Devanagari Marathi", "Noto Serif Devanagari", Georgia,
+    serif;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Background scene — landscape by default, swapped in portrait.             */
+/* `background-size` is set by the Tailwind utility (bg-contain on the div)   */
+/* so the whole artwork stays visible; we only declare the image here.         */
+/* -------------------------------------------------------------------------- */
+.hero-bg {
+  background-image: url("/bg/radio.jpg");
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+@media (orientation: portrait) {
+  .hero-bg {
+    background-image: url("/bg/scene-tall.png");
+  }
+}
+
+/* -------------------------------------------------------------------------- */
+/* Vinyl spin animation — paused/running controlled from JS via style prop    */
+/* -------------------------------------------------------------------------- */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-vinyl {
+  animation: spin 8s linear infinite;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Clock colon blink                                                          */
+/* -------------------------------------------------------------------------- */
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+.colon-blink {
+  animation: blink 1.4s steps(1, end) infinite;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Grain overlay — inline SVG so it travels with the stylesheet, no asset     */
+/* -------------------------------------------------------------------------- */
+.grain-overlay {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix type='matrix' values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.35 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  background-size: 160px 160px;
+  background-repeat: repeat;
+  mix-blend-mode: overlay;
+  opacity: 0.3;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Seek bar — 24px hit area, 3px visible rail, accent fill with soft glow     */
+/* -------------------------------------------------------------------------- */
+.seek-rail {
+  position: relative;
+  height: 24px;                /* hit area */
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  touch-action: none;          /* don't scroll the page while dragging */
+}
+
+.seek-rail__track {
+  position: absolute;
+  inset: 50% 0 auto 0;
+  transform: translateY(-50%);
+  height: 3px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.15);
+  overflow: visible;
+}
+
+.seek-rail__fill {
+  position: absolute;
+  inset: 50% 0 auto 0;
+  transform: translateY(-50%);
+  height: 3px;
+  border-radius: 999px;
+  background: var(--color-accent);
+  box-shadow: 0 0 10px rgba(240, 122, 43, 0.55);
+  pointer-events: none;
+}
+
+.seek-rail__knob {
+  position: absolute;
+  top: 50%;
+  width: 12px;
+  height: 12px;
+  border-radius: 999px;
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+  transform: translate(-50%, -50%) scale(0);
+  transition: transform 120ms ease;
+  pointer-events: none;
+}
+
+.seek-rail:hover .seek-rail__knob,
+.seek-rail:focus-within .seek-rail__knob {
+  transform: translate(-50%, -50%) scale(1);
+}
+
+/* -------------------------------------------------------------------------- */
+/* Accent shadow for the play button                                          */
+/* -------------------------------------------------------------------------- */
+.shadow-accent {
+  box-shadow: 0 8px 24px -6px rgba(240, 122, 43, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+
+/* -------------------------------------------------------------------------- */
+/* Reduce motion: pause the vinyl, no blink                                   */
+/* -------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  .animate-vinyl {
+    animation: none;
+  }
+  .colon-blink {
+    animation: none;
+  }
+}
